@@ -3,72 +3,81 @@ import './Chatbox.css'
 import { io } from "socket.io-client";
 import { makeApi } from '../helper/MakeApi';
 import { userlocalStorageData } from '../helper/localStorage';
-import { toast } from 'react-toastify';
 const Chatbox = () => {
+  // const socket = useMemo(() => io("http://localhost:3020"), []);
   const UserId = userlocalStorageData()
-  const socket = useMemo(() => io("http://localhost:8000"), []);
   const [userData, setUserData] = useState([])
+  const [selectedUser, setSelectedUser] = useState(null);
   const [sendMessage, setSendMessage] = useState("");
   const [userSoketId, setUserSoketId] = useState(null)
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [recieverSocketId, setRecieverSocketId] = useState(null)
+
+
+
+    //function to update socket.id of login user 
+    const updateSocket = async () => {
+      try {
+        const updateId = await makeApi('put', '/updateSocketId', UserId)
+        console.log("updateData", updateId);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
 
   //get register user list here 
   const getUserList = async () => {
     try {
-      const userList = await makeApi('get', '/getAllUserDetails');
-      const filterList = userList.response.filter((item) => item.id !== UserId)
-      setUserData(filterList);
+      const userList = await makeApi('get', '/allUser');
+      setUserData(userList);
     } catch (error) {
       console.log(error);
     }
   }
 
-  //function to update socket.id of login user 
-  const updateSocket = async () => {
+  //update soket id of user 
+  const updateSoketId = async () => {
     try {
-      const dataa = { socket: userSoketId, userid: UserId }
-      const updateId = await makeApi('put', '/updateSocketId', dataa)
-      // console.log("updateData", updateId);
+      const userUpdateSokedID = await makeApi('put', `/editUseDetails`, { socketId: userSoketId })
+      console.log("soket id updated ", userUpdateSokedID);
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.msg);
     }
   }
 
   //function to select user from user list 
   const handleUserClick = (user) => {
-    console.log("hdjkfdkfhdsjfhdsjkfhjd", user);
-    setRecieverSocketId(user.socket_id)
+    console.log(user);
     setSelectedUser(user);
   };
 
   //function to send message at onclick
   const handleSendMessage = async (e) => {
     e.preventDefault();
-
-    socket.emit('user_message', { message: sendMessage, socketId: recieverSocketId })
-    setSendMessage('')
+    socket.emit("message", { message: sendMessage, room: reciverSokcetId })
   }
 
-  useEffect(() => {
-    getUserList()
-    socket.on('connect', () => {
-      setUserSoketId(socket.id)
-      console.log('connected', socket.id);
-    })
+  //useEffect run here to update user soket id
+  // useEffect(() => {
+  //   updateSoketId();
+  // }, [userSoketId])
 
-    socket.on('botMessage', async (data) => {
-      console.log("PersonallyMessage", data);
-      // setPersonallyMessage((userMessage) => [...userMessage, data])
-    })
-  }, [])
+  //useEffect run here for soket.io
+  // useEffect(() => {
+  //   //call function to get register user list 
+  //   getUserList()
 
+  //   socket.on('connect', () => {
+  //     setUserSoketId(socket.id)
+  //     console.log('connected', socket.id);
+  //   })
 
-  useEffect(() => {
-    updateSocket()
-  }, [userSoketId])
+  //   //these message is visible for everyone 
+  //   socket.on("message", (data) => {
+  //     console.log("For Every One", data);
+  //     io.emit('ForEveryOne', data)
+  //   })
 
+  // }, [])
 
 
   return (
@@ -97,7 +106,8 @@ const Chatbox = () => {
             <div className='listchats'>
               {
                 userData.map((item) => (
-                  <div className='listchats-under' key={item.id} onClick={() => handleUserClick(item)}>
+                  <div className='listchats-under' key={item._id} onClick={() => handleUserClick(item)}>
+                    {console.log("-=-=-==-=-=-=-=-", item)}
                     <div className='listchatsudr-data'>
                       <div className="" data-bs-toggle="tooltip" data-bs-placement="right" title="Tooltip on top">
                         <img src='https://img.freepik.com/premium-vector/brunette-man-avatar-portrait-young-guy-vector-illustration-face_217290-1549.jpg?w=740' alt="" data-toggle="tooltip" data-placement="top" title="Tooltip on top" />
@@ -130,7 +140,7 @@ const Chatbox = () => {
                       </div>
                       <div>
                         <h1 className='m-0 mt-2 ms-0 fw-bold' style={{ fontSize: "14px" }}>{selectedUser && selectedUser.firstName + " " + selectedUser.lastName}</h1>
-                        <p className='m-0 ms-0 text-success' style={{ fontSize: "14px" }}>Last seen 2 min ago</p>
+                        {/* <p className='m-0 ms-0 text-success' style={{ fontSize: "14px" }}>Last seen 2 min ago</p> */}
                       </div>
                     </div>
                     <div className="d-flex justify-content-end align-items-center gap-4">

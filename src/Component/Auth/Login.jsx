@@ -3,6 +3,7 @@ import '../../assets/Css/Login.css'
 import { Link } from 'react-router-dom'
 import { makeApi } from '../helper/MakeApi'
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,11 +18,13 @@ const Login = () => {
       [name]: value
     }))
   }
-  const onSubmit = async(e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const userlogin = await makeApi('post', '/UserLogin', userData)
-      console.log(userlogin);
+      const userlogin = await makeApi('post', '/login', userData)
+      console.log("kldgjklljdfjdsfjkdf",userlogin.response.id    );
+      toast.success('login successfully')
+      localStorage.setItem('userId', JSON.stringify(userlogin.response.id))
       navigate('/')
     } catch (error) {
       console.log(error);

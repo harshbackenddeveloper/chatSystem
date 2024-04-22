@@ -3,6 +3,7 @@ import '../../assets/Css/Registerd.css'
 import { Link } from 'react-router-dom'
 import { makeApi } from '../helper/MakeApi';
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const Registerd = () => {
   const navigate = useNavigate();
@@ -19,14 +20,15 @@ const Registerd = () => {
       [name]: value
     }))
   }
-  const onSubmit = async(e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const userRegister = await makeApi('post', '/UserRegister', userData)
-      console.log(userRegister);
+      const userRegister = await makeApi('post', '/register', userData)
+      toast.success('registered successfully')
       navigate('/login')
     } catch (error) {
       console.log(error);
+      toast.error(error.response.data.msg);
     }
   }
   return (
@@ -98,30 +100,8 @@ const Registerd = () => {
                 <div className='d-flex justify-content-center mt-2 mb-3'>
                   <button className='registertbtn' type='submit'>Registerd</button>
                 </div>
-                {/* <div className="col-6">
-                       <div className='Rinputdata mb-4'>
-                        <i className="fa-solid fa-lock"></i>
-                        <input type="text" className='text-white' placeholder='Confirm password' />
-                       </div>
-                      </div> */}
               </div>
-              {/* <div className='Rinputdata mb-4'>
-                     <i className="fa-solid fa-user"></i>
-                     <input type="text" className='text-white' placeholder='Last Name' />
-                    </div>
-                    <div className='Rinputdata mb-4'>
-                     <i className="fa-solid fa-envelope"></i>
-                     <input type="text" className='text-white' placeholder='Email ID' />
-                    </div>
-                    <div className='Rinputdata mb-4'>
-                     <i className="fa-solid fa-lock"></i>
-                     <input type="text" className='text-white' placeholder='Password' />
-                    </div>
-                    <div className='Rinputdata mb-4'>
-                     <i className="fa-solid fa-lock"></i>
-                     <input type="text" className='text-white' placeholder='Confirm password' />
-                    </div>
-                    */}
+            
               <div className="Rinputtext ">
                 <p className='text-white text-center'>Alreay your account exists?<Link to="/login">Login</Link></p>
               </div>
