@@ -24,6 +24,20 @@ const Chatbox = () => {
     }
   }
 
+  //user details by id 
+
+  const GetUserDetails = async (id) => {
+    try {
+      const findUser = await makeApi('get', `/getUserDetailsById/${id}`)
+      // setSeprateDetails(findUser)
+      // setReciverId(findUser._id)
+      // setReciverSokcetId(findUser.socketId)
+      console.log('findUser', findUser);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   //function to update socket.id of login user 
   const updateSocket = async () => {
     try {
@@ -37,11 +51,18 @@ const Chatbox = () => {
   }
 
   //function to select user from user list 
-  const handleUserClick = (user) => {
-    console.log("hdjkfdkfhdsjfhdsjkfhjd", user);
-    setRecieverSocketId(user.socket_id)
-    setSelectedUser(user);
+  const handleUserClick = async (id) => {
+    try {
+      const findUser = await makeApi('get', `/getUserDetailsById/${id}`)
+      console.log('findUser', findUser.response.socket_id    );
+      setRecieverSocketId(findUser.response.socket_id)
+      setSelectedUser(findUser.response);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  console.log("selectedUser", selectedUser);
 
   //function to send message at onclick
   const handleSendMessage = async (e) => {
@@ -97,7 +118,7 @@ const Chatbox = () => {
             <div className='listchats'>
               {
                 userData.map((item) => (
-                  <div className='listchats-under' key={item.id} onClick={() => handleUserClick(item)}>
+                  <div className='listchats-under' key={item.id} onClick={() => handleUserClick(item.id)}>
                     <div className='listchatsudr-data'>
                       <div className="" data-bs-toggle="tooltip" data-bs-placement="right" title="Tooltip on top">
                         <img src='https://img.freepik.com/premium-vector/brunette-man-avatar-portrait-young-guy-vector-illustration-face_217290-1549.jpg?w=740' alt="" data-toggle="tooltip" data-placement="top" title="Tooltip on top" />
