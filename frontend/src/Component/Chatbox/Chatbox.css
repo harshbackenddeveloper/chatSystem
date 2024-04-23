@@ -224,3 +224,14 @@
         padding:  0 30px;
     }
 }
+
+
+.sent-message {
+    text-align: right;
+    /* Add other styles for outgoing messages */
+  }
+  
+  .received-message {
+    text-align: left;
+    /* Add other styles for incoming messages */
+  }

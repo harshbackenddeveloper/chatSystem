@@ -46,12 +46,13 @@ io.on('connection', (socket) => {
 
     socket.on('user_message', async (data) => {
         console.log(1452, data);
+        const dataObj = {
+            message: data.message,
+            type: 'incoming'
+        }
         const getUsers = await getUser(data.socketId);
-        
-        io.to(getUsers.socket_id).emit('botMessage', data.message);
 
-
-        
+        io.to(getUsers.socket_id).emit('botMessage', dataObj);
     });
 
     socket.on('disconnect', () => {

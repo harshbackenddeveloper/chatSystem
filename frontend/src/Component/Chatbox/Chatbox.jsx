@@ -12,6 +12,8 @@ const Chatbox = () => {
   const [userSoketId, setUserSoketId] = useState(null)
   const [selectedUser, setSelectedUser] = useState(null);
   const [recieverSocketId, setRecieverSocketId] = useState(null)
+  const [messages, setMessages] = useState([]);
+
 
   //get register user list here 
   const getUserList = async () => {
@@ -19,20 +21,6 @@ const Chatbox = () => {
       const userList = await makeApi('get', '/getAllUserDetails');
       const filterList = userList.response.filter((item) => item.id !== UserId)
       setUserData(filterList);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  //user details by id 
-
-  const GetUserDetails = async (id) => {
-    try {
-      const findUser = await makeApi('get', `/getUserDetailsById/${id}`)
-      // setSeprateDetails(findUser)
-      // setReciverId(findUser._id)
-      // setReciverSokcetId(findUser.socketId)
-      console.log('findUser', findUser);
     } catch (error) {
       console.log(error);
     }
@@ -50,11 +38,11 @@ const Chatbox = () => {
     }
   }
 
-  //function to select user from user list 
+  //function to set  select user from user list 
   const handleUserClick = async (id) => {
     try {
       const findUser = await makeApi('get', `/getUserDetailsById/${id}`)
-      console.log('findUser', findUser.response.socket_id    );
+      console.log('findUser', findUser.response.socket_id);
       setRecieverSocketId(findUser.response.socket_id)
       setSelectedUser(findUser.response);
     } catch (error) {
@@ -62,18 +50,19 @@ const Chatbox = () => {
     }
   };
 
-  console.log("selectedUser", selectedUser);
-
   //function to send message at onclick
   const handleSendMessage = async (e) => {
     e.preventDefault();
-
     socket.emit('user_message', { message: sendMessage, socketId: recieverSocketId })
+
+    const outgoingMessage = { textMessage: sendMessage, type: 'outgoing' };
+    setMessages([...messages, outgoingMessage]);
     setSendMessage('')
   }
 
   useEffect(() => {
     getUserList()
+
     socket.on('connect', () => {
       setUserSoketId(socket.id)
       console.log('connected', socket.id);
@@ -81,7 +70,8 @@ const Chatbox = () => {
 
     socket.on('botMessage', async (data) => {
       console.log("PersonallyMessage", data);
-      // setPersonallyMessage((userMessage) => [...userMessage, data])
+      const incomingMessage = { textMessage: data.message, type: 'incoming' };
+      setMessages((prevMessages) => [...prevMessages, incomingMessage]);
     })
   }, [])
 
@@ -89,8 +79,6 @@ const Chatbox = () => {
   useEffect(() => {
     updateSocket()
   }, [userSoketId])
-
-
 
   return (
     <>
@@ -163,27 +151,12 @@ const Chatbox = () => {
                 </div>
 
                 <div className="col-12 mt-3 p-0">
-
                   <div className="message-container">
-                    <div className='d-flex flex-column'>
-                      <div className='d-flex align-items-center gap-3'>
-                        <img src='https://img.freepik.com/premium-vector/young-smiling-man-avatar-man-with-brown-beard-mustache-hair-wearing-yellow-sweater-sweatshirt-3d-vector-people-character-illustration-cartoon-minimal-style_365941-860.jpg?w=740' alt="" className='ms-2' />
-                        <div className='message'>
-                          <p className='m-0' style={{ fontSize: "14px" }}>In publishing and graphic design, Lorem ipsum is aplaceholder text commonly used </p>
-                        </div>
-                        <i className="fa-solid fa-ellipsis pb-2"></i>
+                    {messages.map((message, index) => (
+                      <div key={index} className={message.type === 'outgoing' ? 'sent-message' : 'received-message'} >
+                        {message.textMessage}
                       </div>
-                    </div>
-
-                    <div className='d-flex flex-column me-2'>
-                      <div className='d-flex align-items-center justify-content-end gap-3'>
-                        <i className="fa-solid fa-ellipsis ms-2 pb-2"></i>
-                        <div className='tokmessage'>
-                          <p className='m-0' style={{ fontSize: "14px" }}>In publishing and graphic design, Lorem ipsum</p>
-                        </div>
-                        <i className="fa-solid fa-check-double pb-2"></i>
-                      </div>
-                    </div>
+                    ))}
                   </div>
 
                   <div className="col-12 border-top m-0">
