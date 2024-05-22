@@ -1,7 +1,11 @@
 import axios from "axios";
+import { userlocalStorageData } from "./localStorage";
 export const makeApi = async (req, url, body) => {
-    const getToken = localStorage.getItem('Usertoken')
-    const previousUrl = "http://localhost:8000"
+
+    const userData = userlocalStorageData();
+    const getToken = userData ? userData.token : null;
+
+    const previousUrl = "http://192.168.0.202:8000"
     var config = {
         method: req,
         url: previousUrl + url,

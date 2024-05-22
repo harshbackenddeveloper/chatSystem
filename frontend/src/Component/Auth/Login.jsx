@@ -22,12 +22,12 @@ const Login = () => {
     e.preventDefault();
     try {
       const userlogin = await makeApi('post', '/login', userData)
-      console.log("kldgjklljdfjdsfjkdf",userlogin.response.id    );
       toast.success('login successfully')
-      localStorage.setItem('userId', JSON.stringify(userlogin.response.id))
+      localStorage.setItem('userDetails', JSON.stringify(userlogin))
       navigate('/')
     } catch (error) {
       console.log(error);
+      toast.error(error.response.data.msg)
     }
   }
   return (

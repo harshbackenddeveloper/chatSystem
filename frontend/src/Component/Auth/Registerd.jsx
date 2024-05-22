@@ -25,10 +25,11 @@ const Registerd = () => {
     try {
       const userRegister = await makeApi('post', '/register', userData)
       toast.success('registered successfully')
+      console.log("userRegister", userRegister);
       navigate('/login')
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.msg);
+      toast.error(error.response);
     }
   }
   return (
@@ -101,7 +102,7 @@ const Registerd = () => {
                   <button className='registertbtn' type='submit'>Registerd</button>
                 </div>
               </div>
-            
+
               <div className="Rinputtext ">
                 <p className='text-white text-center'>Alreay your account exists?<Link to="/login">Login</Link></p>
               </div>
